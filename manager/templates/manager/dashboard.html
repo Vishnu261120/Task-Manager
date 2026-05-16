@@ -1,0 +1,64 @@
+{% extends 'manager/base.html' %}
+{% block title %}Dashboard | Team Task Manager{% endblock %}
+{% block content %}
+<h1>Dashboard</h1>
+<p class="muted">Welcome, {{ user.first_name|default:user.username }}.</p>
+<div class="grid">
+  <div class="card"><h3>Total Tasks</h3><p style="font-size:34px;">{{ stats.total_tasks }}</p></div>
+  <div class="card"><h3>To Do</h3><p style="font-size:34px;">{{ stats.todo }}</p></div>
+  <div class="card"><h3>In Progress</h3><p style="font-size:34px;">{{ stats.in_progress }}</p></div>
+  <div class="card"><h3>Done</h3><p style="font-size:34px;">{{ stats.done }}</p></div>
+  <div class="card"><h3>Overdue</h3><p style="font-size:34px;">{{ stats.overdue }}</p></div>
+</div>
+<div class="row">
+  <div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h2>My Projects</h2>
+        <a class="btn" href="{% url 'project_create' %}">New Project</a>
+      </div>
+      <table>
+        <tr><th>Project</th><th>Tasks</th><th></th></tr>
+        {% for project in projects %}
+        <tr>
+          <td>{{ project.name }}</td>
+          <td>{{ project.task_count }}</td>
+          <td><a href="{% url 'project_detail' project.id %}">Open</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3" class="muted">No projects yet.</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+    <div class="card">
+      <h2>Recent Tasks</h2>
+      <table>
+        <tr><th>Task</th><th>Status</th><th>Project</th></tr>
+        {% for task in recent_tasks %}
+        <tr>
+          <td>{{ task.title }}</td>
+          <td><span class="pill">{{ task.status }}</span></td>
+          <td>{{ task.project.name }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3" class="muted">No tasks yet.</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+  <div>
+    <div class="card">
+      <h2>Tasks per User</h2>
+      {% for item in tasks_by_user %}
+        <p>{{ item.assigned_to__first_name|default:'Unassigned' }}: <strong>{{ item.total }}</strong></p>
+      {% empty %}
+        <p class="muted">No task data.</p>
+      {% endfor %}
+    </div>
+    <div class="card">
+      <h2>Assignment Coverage</h2>
+      <p class="muted">Projects, members, task assignment, statuses, overdue tracking, and admin/member controls are all included.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

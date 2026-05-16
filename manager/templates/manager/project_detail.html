@@ -1,0 +1,72 @@
+{% extends 'manager/base.html' %}
+{% block title %}{{ project.name }} | Team Task Manager{% endblock %}
+{% block content %}
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+    <div>
+      <h1>{{ project.name }}</h1>
+      <p>{{ project.description|default:'No description.' }}</p>
+      <p class="muted">Created by {{ project.created_by.first_name|default:project.created_by.username }}</p>
+    </div>
+    {% if is_admin %}
+    <div>
+      <a class="btn secondary" href="{% url 'project_update' project.id %}">Edit Project</a>
+      <a class="btn danger" href="{% url 'project_delete' project.id %}">Delete</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="row">
+  <div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h2>Tasks</h2>
+        {% if is_admin %}<a class="btn" href="{% url 'task_create' project.id %}">New Task</a>{% endif %}
+      </div>
+      <table>
+        <tr><th>Title</th><th>Status</th><th>Priority</th><th>Due</th><th>Assigned</th><th></th></tr>
+        {% for task in tasks %}
+        <tr>
+          <td>{{ task.title }}</td>
+          <td><span class="pill">{{ task.status }}</span></td>
+          <td>{{ task.priority }}</td>
+          <td>{% if task.due_date %}{{ task.due_date }}{% else %}-{% endif %}{% if task.is_overdue %} <strong style="color:#dc2626;">(Overdue)</strong>{% endif %}</td>
+          <td>{{ task.assigned_to.first_name|default:'Unassigned' }}</td>
+          <td>
+            {% if is_admin %}<a href="{% url 'task_update' task.id %}">Edit</a> | <a href="{% url 'task_delete' task.id %}">Delete</a>{% else %}<a href="{% url 'task_status_update' task.id %}">Update Status</a>{% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="muted">No tasks yet.</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+  <div>
+    {% if is_admin %}
+    <div class="card">
+      <h2>Add Member</h2>
+      <form method="post" action="{% url 'add_member' project.id %}">
+        {% csrf_token %}
+        {{ member_form.as_p }}
+        <button class="btn" type="submit">Add Member</button>
+      </form>
+    </div>
+    {% endif %}
+    <div class="card">
+      <h2>Members</h2>
+      <table>
+        <tr><th>Name</th><th>Role</th><th></th></tr>
+        {% for membership in members %}
+        <tr>
+          <td>{{ membership.user.first_name|default:membership.user.username }}</td>
+          <td>{{ membership.role }}</td>
+          <td>{% if is_admin and membership.user_id != user.id %}<a href="{% url 'remove_member' project.id membership.id %}">Remove</a>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

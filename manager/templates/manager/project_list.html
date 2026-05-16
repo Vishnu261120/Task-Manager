@@ -1,0 +1,23 @@
+{% extends 'manager/base.html' %}
+{% block title %}Projects | Team Task Manager{% endblock %}
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:center;gap:16px;">
+  <div>
+    <h1>Projects</h1>
+    <p class="muted">Only projects you belong to are shown.</p>
+  </div>
+  <a class="btn" href="{% url 'project_create' %}">Create Project</a>
+</div>
+<div class="grid">
+  {% for project in projects %}
+  <div class="card">
+    <h3>{{ project.name }}</h3>
+    <p>{{ project.description|default:'No description.' }}</p>
+    <p class="muted">Tasks: {{ project.task_count }}</p>
+    <a class="btn" href="{% url 'project_detail' project.id %}">Open</a>
+  </div>
+  {% empty %}
+  <div class="card"><p>No projects yet.</p></div>
+  {% endfor %}
+</div>
+{% endblock %}

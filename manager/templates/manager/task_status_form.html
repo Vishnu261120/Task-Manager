@@ -1,0 +1,13 @@
+{% extends 'manager/base.html' %}
+{% block title %}Update Status | Team Task Manager{% endblock %}
+{% block content %}
+<div class="card" style="max-width:500px;margin:0 auto;">
+  <h1>Update Status</h1>
+  <p>{{ task.title }}</p>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn" type="submit">Update</button>
+  </form>
+</div>
+{% endblock %}
