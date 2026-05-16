@@ -54,11 +54,29 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'team_task_manager.wsgi.application'
 
+import os
+import dj_database_url
+
 DATABASES = {
-    #'default': dj_database_url.config(default=f'sqlite:///{BASE_DIR / "db.sqlite3"}', conn_max_age=600)
+    # 1. Relational Database Block
+    # On Localhost: Automatically uses his local SQLite file (db.sqlite3)
+    # On Railway: Automatically swaps to the production PostgreSQL database
     'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL')
-    )
+        default=f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}",
+        conn_max_age=600,
+        ssl_require=True if os.environ.get('DATABASE_URL') else False
+    ),
+    
+    # 2. NoSQL Database Block
+    # Handles his MongoDB connection seamlessly
+    'mongodb': {
+        'ENGINE': 'djongo',
+        'NAME': 'team_manager_db',
+        'ENFORCE_SCHEMA': False,
+        'CLIENT': {
+            'host': os.environ.get('MONGO_URL', 'mongodb://localhost:27017/') # Fixed: Removed /test_db from fallback
+        }
+    }
 }
 
 AUTH_PASSWORD_VALIDATORS = [
